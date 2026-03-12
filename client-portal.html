@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Support Ticket — Submit a Request</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --psa-blue:      #0047AB;
+    --psa-blue-mid:  #1565C0;
+    --psa-blue-lt:   #E8F0FE;
+    --psa-blue-pale: #F0F6FF;
+    --psa-yellow:    #F5A800;
+    --psa-yellow-lt: #FFF8E7;
+    --psa-red:       #C8102E;
+    --psa-red-lt:    #FFF0F2;
+    --bg:        #F4F6FA;
+    --surface:   #FFFFFF;
+    --surface2:  #F8FAFD;
+    --border:    #DDE3EE;
+    --border-md: #C4CEDF;
+    --text:      #1A2540;
+    --text-mid:  #4A5878;
+    --text-dim:  #8A96AE;
+    --font-head: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --shadow-sm: 0 1px 3px rgba(0,71,171,0.08), 0 1px 2px rgba(0,71,171,0.04);
+    --shadow:    0 4px 12px rgba(0,71,171,0.10), 0 2px 4px rgba(0,71,171,0.06);
+    --shadow-lg: 0 12px 32px rgba(0,71,171,0.14), 0 4px 12px rgba(0,71,171,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: 14px;
+  }
+
+  /* Same dot-grid background as admin */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, rgba(0,71,171,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 36px 20px 72px;
+  }
+
+  /* ─── Top Header Bar (mirrors sidebar blue + topbar stripe) ─── */
+  .page-header {
+    background: var(--psa-blue);
+    border-radius: 12px 12px 0 0;
+    padding: 26px 32px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+    animation: slideDown 0.45s ease both;
+  }
+
+  /* Tricolor stripe — same as admin topbar::after */
+  .page-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+      var(--psa-blue-mid) 33.3%,
+      var(--psa-yellow)   33.3% 66.6%,
+      var(--psa-red)      66.6%);
+    opacity: 0.9;
+  }
+
+  /* Decorative circle — mirrors sidebar::after vibe */
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    border: 48px solid rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+
+  .header-logo {
+    width: 60px; height: 60px;
+    object-fit: contain;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+  }
+
+  .header-text { flex: 1; }
+
+  .header-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 2.5px;
+    color: var(--psa-yellow);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    opacity: 0.9;
+  }
+
+  .header-title {
+    font-family: var(--font-head);
+    font-size: clamp(17px, 2.8vw, 24px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+  }
+
+  .header-title span { color: var(--psa-yellow); }
+
+  .header-sub {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.3px;
+  }
+
+  .header-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 20px;
+    padding: 6px 14px;
+    flex-shrink: 0;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ADE80;
+    box-shadow: 0 0 6px #4ADE80;
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .status-text {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* ─── Form Card ─── */
+  .form-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    padding: 32px 32px 28px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.45s ease 0.12s both;
+  }
+
+  /* Info notice */
+  .notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--psa-blue-pale);
+    border: 1.5px solid rgba(0,71,171,0.14);
+    border-left: 4px solid var(--psa-blue);
+    border-radius: 0 8px 8px 0;
+    padding: 11px 15px;
+    margin-bottom: 26px;
+    font-size: 12.5px;
+    color: var(--psa-blue);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .notice-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .notice strong { font-weight: 700; }
+
+  /* ─── Section Labels — exact style from admin .table-title / section areas ─── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--psa-blue);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    margin-top: 26px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--psa-blue-lt);
+  }
+
+  .section-label:first-of-type { margin-top: 0; }
+
+  /* Left accent bar — same 4px left-border as admin stat cards */
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 13px;
+    background: var(--psa-blue);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .section-num {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: var(--text-dim);
+    background: var(--border);
+    padding: 1px 7px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* ─── Form Layout ─── */
+  .form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 16px; }
+
+  /* ─── Labels ─── */
+  label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+  }
+
+  label .required { color: var(--psa-red); margin-left: 1px; }
+
+  /* ─── Inputs / Selects — mirrors admin .filter-select + form inputs ─── */
+  input, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-head);
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 10px 13px;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--psa-blue);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(0,71,171,0.09);
+  }
+
+  input::placeholder { color: var(--text-dim); font-weight: 400; }
+
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230047AB' fill='none' stroke-width='1.8'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    background-color: var(--surface2);
+    padding-right: 38px;
+  }
+
+  select option    { background: #fff; color: var(--text); }
+  select optgroup  { color: var(--psa-blue); font-style: normal; font-weight: 700; }
+
+  input[type="date"], input[type="time"] { color-scheme: light; }
+
+  /* Email hint */
+  .email-hint {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.4px;
+    margin-top: 5px;
+    line-height: 1.6;
+  }
+  .email-hint b { color: var(--psa-yellow); font-weight: 600; }
+
+  /* Other panels */
+  .other-panel { display: none; margin-top: 7px; }
+  .other-panel.show { display: block; }
+
+  .other-panel-hint {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    color: var(--psa-blue);
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    opacity: 0.65;
+  }
+
+  .other-panel input {
+    border-color: var(--psa-yellow);
+    background: var(--psa-yellow-lt);
+    font-style: italic;
+  }
+
+  .other-panel input:focus {
+    border-color: var(--psa-blue);
+    background: var(--surface);
+    font-style: normal;
+  }
+
+  /* ─── Divider ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 8px 0 0;
+  }
+
+  /* ─── Submit Button — mirrors admin .btn-refresh style, scaled up ─── */
+  .btn-submit {
+    width: 100%;
+    margin-top: 26px;
+    padding: 13px 24px;
+    background: var(--psa-blue);
+    border: 1.5px solid var(--psa-blue);
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.22s, box-shadow 0.22s, transform 0.18s;
+    box-shadow: 0 4px 14px rgba(0,71,171,0.28);
+  }
+
+  .btn-submit::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.22s;
+  }
+
+  .btn-submit:hover {
+    background: var(--psa-blue-mid);
+    box-shadow: 0 6px 22px rgba(0,71,171,0.38);
+    transform: translateY(-1px);
+  }
+
+  .btn-submit:hover::before { opacity: 1; }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .btn-arrow { font-size: 16px; transition: transform 0.2s; }
+  .btn-submit:hover .btn-arrow { transform: translateX(4px); }
+
+  /* ─── Toast ─── */
+  #toast {
+    position: fixed;
+    bottom: 26px; right: 26px;
+    padding: 12px 18px;
+    font-family: var(--font-head);
+    font-size: 12.5px;
+    font-weight: 600;
+    z-index: 9999;
+    border-radius: 8px;
+    transform: translateY(70px);
+    opacity: 0;
+    transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 340px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #toast.show    { transform: translateY(0); opacity: 1; }
+  #toast.success { background: var(--surface); border: 1.5px solid rgba(27,122,62,0.25); border-left: 4px solid #1B7A3E; color: #1B7A3E; }
+  #toast.error   { background: var(--surface); border: 1.5px solid rgba(200,16,46,0.2);  border-left: 4px solid var(--psa-red);  color: var(--psa-red);  }
+
+  /* ─── Footer ─── */
+  .page-footer {
+    text-align: center;
+    margin-top: 18px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    animation: fadeUp 0.45s ease 0.25s both;
+  }
+  .page-footer span { color: var(--psa-blue); font-weight: 600; }
+
+  /* ─── Scrollbar (admin-matching) ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface2); }
+  ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--psa-blue); }
+
+  @keyframes slideDown { from { opacity:0; transform: translateY(-14px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes fadeUp    { from { opacity:0; transform: translateY(14px);  } to { opacity:1; transform: translateY(0); } }
+
+  @media(max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .form-card, .page-header { padding: 20px 18px; }
+    .header-status { display: none; }
+    .wrapper { padding: 18px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- ═══ PAGE HEADER ═══ -->
+  <div class="page-header">
+    <img class="header-logo" src="data:image/jpeg;base64,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" alt="PSA Logo"/>
+    <div class="header-text">
+      <div class="header-eyebrow">Philippine Statistics Authority · SOID</div>
+      <div class="header-title"><span>IT Support</span> Ticket System</div>
+      <div class="header-sub">Submit your concern and our team will respond shortly</div>
+    </div>
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span class="status-text">System Online</span>
+    </div>
+  </div>
+
+  <!-- ═══ FORM CARD ═══ -->
+  <div class="form-card">
+
+    <div class="notice">
+      <span class="notice-icon">ℹ️</span>
+      <span>All fields marked <strong>*</strong> are required. Your <strong>email address</strong> is needed to receive a feedback link once your ticket is resolved.</span>
+    </div>
+
+    <!-- ── 01 Requestor Information ── -->
+    <div class="section-label">
+      Requestor Information
+      <span class="section-num">01 / 04</span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Full Name <span class="required">*</span></label>
+        <input type="text" id="name" placeholder="Juan dela Cruz"/>
+      </div>
+      <div class="form-group">
+        <label>Division <span class="required">*</span></label>
+        <select id="division" onchange="toggleOther('division')">
+          <option value="">— Select Division —</option>
+          <optgroup label="ONS">
+            <option>PMS</option><option>SMU</option><option>ICU</option><option>LS</option><option>IAD</option><option>FMD</option><option>GMD</option>
+          </optgroup>
+          <optgroup label="CRS OANS">
+            <option>CRCSO ODNS</option><option>CRS OANS</option><option>CRMD</option><option>VSD</option><option>CRSD</option>
+          </optgroup>
+          <optgroup label="FAS OANS">
+            <option>FAS OANS</option><option>AD</option><option>BD</option><option>GSD</option><option>HRD</option>
+          </optgroup>
+          <optgroup label="SSO ODNS">
+            <option>SSO ODNS</option><option>SSO OANS</option><option>IESD</option><option>DHSD</option><option>SDSD</option><option>PHDSD</option><option>LDRSSD</option><option>LSSD</option>
+          </optgroup>
+          <optgroup label="ESSS OANS">
+            <option>ESSS OANS</option><option>PSD</option><option>SSSS-SSD</option><option>ISD</option><option>TSD</option><option>CSD</option><option>LPSD</option><option>FSD</option>
+          </optgroup>
+          <optgroup label="MAS OANS">
+            <option>MAS OANS</option><option>PAD</option><option>EIAD</option><option>SAD</option><option>ENRAD</option><option>AAD</option><option>SEAD</option>
+          </optgroup>
+          <optgroup label="CTCO ODNS">
+            <option>CTCO ODNS</option><option>NCS OANS</option><option>SICD</option><option>CPCD</option><option>AFCD</option><option>PHCD</option>
+          </optgroup>
+          <optgroup label="SS OANS">
+            <option>SS OANS</option><option>SPPD</option><option>SS-SSD</option><option>SCD</option>
+          </optgroup>
+          <optgroup label="ITDS OANS">
+            <option>ITDS OANS</option><option>SDD</option><option>SOID</option><option>SQAD</option><option>RDMD</option><option>KMCD</option>
+          </optgroup>
+          <optgroup label="CBSS OANS">
+            <option>CBSS OANS</option><option>CBMS-PCD</option><option>CBSD</option>
+          </optgroup>
+          <optgroup label="PRO-ODNS">
+            <option>PRO-ODNS</option><option>PCMS OANS</option><option>PPCD</option><option>MED</option>
+          </optgroup>
+          <optgroup label="ROS OANS">
+            <option>ROS OANS</option><option>IVD</option><option>IDPMD</option><option>RMD</option>
+          </optgroup>
+          <optgroup label="SISS OANS">
+            <option>SISS OANS</option><option>ISMD</option><option>DCRPID</option><option>ICD</option>
+          </optgroup>
+          <optgroup label="UCDMS OANS">
+            <option>UCDMS OANS</option><option>SPUCD</option><option>GSUCD</option><option>FPSUCD</option>
+          </optgroup>
+          <optgroup label="FMCMS OANS">
+            <option>FMCMS OANS</option><option>FGD</option>
+          </optgroup>
+          <option value="__other__">➕ Add New (not in list)</option>
+        </select>
+        <div class="other-panel" id="division-panel">
+          <p class="other-panel-hint">▸ ENTER DIVISION NAME BELOW</p>
+          <input type="text" id="division-custom" placeholder="Type division name..."/>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Email Address <span class="required">*</span></label>
+      <input type="email" id="email" placeholder="yourname@psa.gov.ph"/>
+      <div class="email-hint">⚡ Required for receiving your feedback link when your ticket is resolved. <b>The link will be sent to this address.</b></div>
+    </div>
+
+    <!-- ── 02 Location Details ── -->
+    <div class="section-label">
+      Location Details
+      <span class="section-num">02 / 04</span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Building <span class="required">*</span></label>
+        <select id="building" onchange="toggleOther('building')">
+          <option value="">— Select Building —</option>
+          <option>PSA HQ</option>
+          <option>TAM</option>
+          <option>CVEA</option>
+          <option>CRS</option>
+          <option value="__other__">Others (specify)</option>
+        </select>
+        <div class="other-panel" id="building-panel">
+          <p class="other-panel-hint">▸ ENTER BUILDING NAME BELOW</p>
+          <input type="text" id="building-custom" placeholder="Type building name..."/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Floor Level / Room <span class="required">*</span></label>
+        <input type="text" id="floor" placeholder="e.g. 3rd Floor, Room 302"/>
+      </div>
+    </div>
+
+    <!-- ── 03 Schedule ── -->
+    <div class="section-label">
+      Preferred Schedule
+      <span class="section-num">03 / 04</span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date <span class="required">*</span></label>
+        <input type="date" id="date"/>
+      </div>
+      <div class="form-group">
+        <label>Time <span class="required">*</span></label>
+        <input type="time" id="time"/>
+      </div>
+    </div>
+
+    <!-- ── 04 Concern / Issue ── -->
+    <div class="section-label">
+      Concern / Issue
+      <span class="section-num">04 / 04</span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Concern Type <span class="required">*</span></label>
+        <select id="concern" onchange="toggleOther('concern')">
+          <option value="">— Select Concern —</option>
+          <option>Internet Concern</option>
+          <option>PSA Wifi Concern</option>
+          <option>Printer Concern</option>
+          <option>Microsoft Office Concern</option>
+          <option>Email Concern</option>
+          <option>Server Concern</option>
+          <option>Laptop Concern</option>
+          <option>Desktop PC Concern</option>
+          <option>Storage Issue Concern</option>
+          <option>ATS Concern</option>
+          <option>Monitor Concern</option>
+          <option value="__other__">Others (specify)</option>
+        </select>
+        <div class="other-panel" id="concern-panel">
+          <p class="other-panel-hint">▸ DESCRIBE CONCERN TYPE BELOW</p>
+          <input type="text" id="concern-custom" placeholder="Type concern type..."/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Subject <span class="required">*</span></label>
+        <input type="text" id="subject" placeholder="Brief description of your issue"/>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitTicket()">
+      Submit Ticket
+      <span class="btn-arrow">→</span>
+    </button>
+
+  </div><!-- /form-card -->
+
+  <div class="page-footer">
+    <span>SOID IT Support</span> &nbsp;·&nbsp; Philippine Statistics Authority &nbsp;·&nbsp; Automated Ticketing System
+  </div>
+
+</div><!-- /wrapper -->
+
+<div id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000';
+
+function toggleOther(field) {
+  const sel    = document.getElementById(field);
+  const panel  = document.getElementById(field + '-panel');
+  const custom = document.getElementById(field + '-custom');
+  if (sel.value === '__other__') {
+    panel.classList.add('show');
+    custom.focus();
+  } else {
+    panel.classList.remove('show');
+    custom.value = '';
+  }
+}
+
+function resolveField(field) {
+  const sel = document.getElementById(field);
+  if (sel.value === '__other__') {
+    return document.getElementById(field + '-custom').value.trim();
+  }
+  return sel.value.trim();
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => { t.className = ''; }, 3800);
+}
+
+async function submitTicket() {
+  const name     = document.getElementById('name').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const division = resolveField('division');
+  const building = resolveField('building');
+  const floor    = document.getElementById('floor').value.trim();
+  const date     = document.getElementById('date').value;
+  const time     = document.getElementById('time').value;
+  const concern  = resolveField('concern');
+  const subject  = document.getElementById('subject').value.trim();
+
+  const checks = [
+    [name,     'Full Name'],
+    [email,    'Email Address'],
+    [division, 'Division'],
+    [building, 'Building'],
+    [floor,    'Floor Level / Room'],
+    [date,     'Date'],
+    [time,     'Time'],
+    [concern,  'Concern Type'],
+    [subject,  'Subject'],
+  ];
+
+  for (const [val, label] of checks) {
+    if (!val) { showToast(`⚠ ${label} is required.`, 'error'); return; }
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('⚠ Please enter a valid email address.', 'error'); return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="opacity:.7">Submitting...</span>';
+
+  try {
+    const res  = await fetch(`${API}/api/tickets`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, division, building, floor, date, time, concern, subject })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`✓ Ticket #${data.ticket_id} submitted! You'll receive an email when resolved.`);
+      resetForm();
+    } else {
+      showToast('✗ ' + data.error, 'error');
+    }
+  } catch (e) {
+    showToast('✗ Cannot connect to server. Is it running?', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Ticket <span class="btn-arrow">→</span>';
+  }
+}
+
+function resetForm() {
+  ['name','email','floor','subject','time'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  ['division','building','concern'].forEach(field => {
+    document.getElementById(field).value = '';
+    document.getElementById(field + '-panel').classList.remove('show');
+    document.getElementById(field + '-custom').value = '';
+  });
+  document.getElementById('date').valueAsDate = new Date();
+}
+
+document.getElementById('date').valueAsDate = new Date();
+</script>
+</body>
+</html>
