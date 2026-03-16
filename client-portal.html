@@ -633,7 +633,10 @@
 <div id="toast"></div>
 
 <script>
-const API = 'http://localhost:5000';
+// Auto-detect: if opened via ngrok/server use current origin, else fallback to localhost
+const API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000'
+  : location.origin;
 
 function toggleOther(field) {
   const sel    = document.getElementById(field);
